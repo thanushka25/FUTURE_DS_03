@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Marketing Funnel Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {
+    font-family: Arial;
+    margin: 0;
+    background: #eef2f7;
+}
+
+h1 {
+    text-align: center;
+    padding: 20px;
+}
+
+.kpi-container {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px;
+}
+
+.kpi {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    width: 200px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 20px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>📊 Marketing Funnel Dashboard</h1>
+
+<!-- KPI Section -->
+<div class="kpi-container">
+    <div class="kpi">Total Visitors<br><span id="visitors"></span></div>
+    <div class="kpi">Total Leads<br><span id="leads"></span></div>
+    <div class="kpi">Total Customers<br><span id="customers"></span></div>
+    <div class="kpi">Conversion Rate<br><span id="conversion"></span>%</div>
+</div>
+
+<div class="dashboard">
+
+    <div class="card">
+        <h3>Funnel Stages</h3>
+        <canvas id="funnelChart"></canvas>
+    </div>
+
+    <div class="card">
+        <h3>Channel Conversion Rate</h3>
+        <canvas id="channelChart"></canvas>
+    </div>
+
+    <div class="card">
+        <h3>Lead Conversion</h3>
+        <canvas id="leadChart"></canvas>
+    </div>
+
+    <div class="card">
+        <h3>Customer Conversion</h3>
+        <canvas id="customerChart"></canvas>
+    </div>
+
+</div>
+
+<script>
+
+
+const data = [
+    {channel:"Google Ads", visitors:1000, leads:200, qualified:120, customers:50},
+    {channel:"Facebook", visitors:800, leads:150, qualified:80, customers:30},
+    {channel:"Email", visitors:500, leads:200, qualified:150, customers:90}
+];
+
+
+let totalVisitors = 0, totalLeads = 0, totalCustomers = 0;
+
+data.forEach(d => {
+    totalVisitors += d.visitors;
+    totalLeads += d.leads;
+    totalCustomers += d.customers;
+});
+
+let conversionRate = ((totalCustomers / totalVisitors) * 100).toFixed(2);
+
+
+document.getElementById("visitors").innerText = totalVisitors;
+document.getElementById("leads").innerText = totalLeads;
+document.getElementById("customers").innerText = totalCustomers;
+document.getElementById("conversion").innerText = conversionRate;
+
+
+new Chart(document.getElementById("funnelChart"), {
+    type: 'bar',
+    data: {
+        labels: ["Visitors", "Leads", "Qualified", "Customers"],
+        datasets: [{
+            label: 'Users',
+            data: [
+                totalVisitors,
+                totalLeads,
+                data.reduce((a,b)=>a+b.qualified,0),
+                totalCustomers
+            ]
+        }]
+    }
+});
+
+
+new Chart(document.getElementById("channelChart"), {
+    type: 'bar',
+    data: {
+        labels: data.map(d => d.channel),
+        datasets: [{
+            label: 'Customer Conversion %',
+            data: data.map(d => ((d.customers / d.visitors) * 100).toFixed(2))
+        }]
+    }
+});
+
+
+new Chart(document.getElementById("leadChart"), {
+    type: 'bar',
+    data: {
+        labels: data.map(d => d.channel),
+        datasets: [{
+            label: 'Lead Conversion %',
+            data: data.map(d => ((d.leads / d.visitors) * 100).toFixed(2))
+        }]
+    }
+});
+
+
+new Chart(document.getElementById("customerChart"), {
+    type: 'bar',
+    data: {
+        labels: data.map(d => d.channel),
+        datasets: [{
+            label: 'Customer Conversion %',
+            data: data.map(d => ((d.customers / d.leads) * 100).toFixed(2))
+        }]
+    }
+});
+
+</script>
+
+</body>
+</html>
